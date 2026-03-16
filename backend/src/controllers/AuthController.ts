@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { User } from '../models/User';
 import { generateTokens, verifyRefreshToken, extractTokenFromHeader } from '../utils/jwt';
-import { ApiResponse } from '@shared/types';
+import { ApiResponse } from '../types';
 
 export class AuthController {
   // User registration

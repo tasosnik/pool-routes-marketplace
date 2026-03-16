@@ -1,12 +1,12 @@
 import { BaseModel } from './BaseModel';
-import { Route as IRoute, RouteStatus, ServiceArea, Coordinates } from '@shared/types';
+import { Route as IRoute, RouteStatus, ServiceArea, Coordinates } from '../types';
 
 export class Route extends BaseModel {
   protected static tableName = 'routes';
 
   static async findByOwnerId(ownerId: string): Promise<IRoute[]> {
     const routes = await this.query().where('owner_id', ownerId);
-    return routes.map(route => this.mapToRoute(route));
+    return routes.map((route: Record<string, any>) => this.mapToRoute(route));
   }
 
   static async createRoute(routeData: {
@@ -100,7 +100,7 @@ export class Route extends BaseModel {
     }
 
     const routes = await query.orderBy('monthly_revenue', 'desc');
-    return routes.map(route => this.mapToRoute(route));
+    return routes.map((route: Record<string, any>) => this.mapToRoute(route));
   }
 
   static async getRouteWithAccounts(routeId: string): Promise<IRoute | null> {
@@ -148,7 +148,7 @@ export class Route extends BaseModel {
   }
 
   // Map database record to Route interface
-  private static mapToRoute(dbRoute: any): IRoute {
+  private static mapToRoute(dbRoute: Record<string, any>): IRoute {
     const serviceArea: ServiceArea = {
       name: dbRoute.service_area_name,
       boundaries: dbRoute.service_area_boundaries ?

@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import { User as IUser } from '@shared/types';
+import { User as IUser } from '../types';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-for-development';
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d';
@@ -13,20 +13,28 @@ export interface JWTPayload {
 }
 
 export const generateTokens = (user: IUser) => {
-  const payload: Omit<JWTPayload, 'type'> = {
+  const accessPayload: JWTPayload = {
     userId: user.id,
     email: user.email,
-    role: user.role
+    role: user.role,
+    type: 'access'
   };
 
-  const accessToken = jwt.sign(
-    { ...payload, type: 'access' },
+  const refreshPayload: JWTPayload = {
+    userId: user.id,
+    email: user.email,
+    role: user.role,
+    type: 'refresh'
+  };
+
+  const accessToken = (jwt as any).sign(
+    accessPayload,
     JWT_SECRET,
     { expiresIn: JWT_EXPIRES_IN }
   );
 
-  const refreshToken = jwt.sign(
-    { ...payload, type: 'refresh' },
+  const refreshToken = (jwt as any).sign(
+    refreshPayload,
     JWT_SECRET,
     { expiresIn: JWT_REFRESH_EXPIRES_IN }
   );

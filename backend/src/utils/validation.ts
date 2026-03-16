@@ -1,5 +1,5 @@
 import Joi from 'joi';
-import { UserRole, ServiceType, ServiceFrequency, PoolType, PoolSize } from '@shared/types';
+import { UserRole, ServiceType, ServiceFrequency, PoolType, PoolSize } from '../types';
 
 // User validation schemas
 export const registerSchema = Joi.object({

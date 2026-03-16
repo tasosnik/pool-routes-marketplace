@@ -5,7 +5,7 @@ export { Route } from './Route';
 export { PoolAccount } from './PoolAccount';
 
 // Model initialization - run migrations if needed
-import { db, testConnection } from '../config/database';
+import { db, testConnection, closeConnection } from '../config/database';
 
 export const initializeDatabase = async (): Promise<boolean> => {
   try {
@@ -26,4 +26,4 @@ export const initializeDatabase = async (): Promise<boolean> => {
   }
 };
 
-export { db };
+export { db, closeConnection };

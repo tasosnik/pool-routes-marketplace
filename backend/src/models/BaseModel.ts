@@ -89,6 +89,9 @@ export abstract class BaseModel {
 
   // Raw query
   static async raw(query: string, bindings?: any[]): Promise<any> {
-    return db.raw(query, bindings);
+    if (bindings) {
+      return db.raw(query, bindings);
+    }
+    return db.raw(query);
   }
 }

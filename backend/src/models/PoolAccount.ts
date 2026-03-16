@@ -1,5 +1,5 @@
 import { BaseModel } from './BaseModel';
-import { PoolAccount as IPoolAccount, Address, AccountStatus, ServiceType, PoolType, PoolSize, ServiceFrequency } from '@shared/types';
+import { PoolAccount as IPoolAccount, Address, AccountStatus, ServiceType, PoolType, PoolSize, ServiceFrequency } from '../types';
 import { Route } from './Route';
 
 export class PoolAccount extends BaseModel {
@@ -7,7 +7,7 @@ export class PoolAccount extends BaseModel {
 
   static async findByRouteId(routeId: string): Promise<IPoolAccount[]> {
     const accounts = await this.query().where('route_id', routeId);
-    return accounts.map(account => this.mapToPoolAccount(account));
+    return accounts.map((account: Record<string, any>) => this.mapToPoolAccount(account));
   }
 
   static async createAccount(accountData: {
@@ -105,7 +105,7 @@ export class PoolAccount extends BaseModel {
     }
 
     const accounts = await query.orderBy('next_service_date', 'asc');
-    return accounts.map(account => this.mapToPoolAccount(account));
+    return accounts.map((account: Record<string, any>) => this.mapToPoolAccount(account));
   }
 
   static async searchAccounts(filters: {
@@ -143,7 +143,7 @@ export class PoolAccount extends BaseModel {
     }
 
     const accounts = await query.orderBy('customer_name', 'asc');
-    return accounts.map(account => this.mapToPoolAccount(account));
+    return accounts.map((account: Record<string, any>) => this.mapToPoolAccount(account));
   }
 
   static async bulkCreateAccounts(routeId: string, accountsData: Partial<IPoolAccount>[]): Promise<IPoolAccount[]> {
@@ -202,7 +202,7 @@ export class PoolAccount extends BaseModel {
   }
 
   // Map database record to PoolAccount interface
-  private static mapToPoolAccount(dbAccount: any): IPoolAccount {
+  private static mapToPoolAccount(dbAccount: Record<string, any>): IPoolAccount {
     const address: Address = {
       street: dbAccount.street,
       city: dbAccount.city,

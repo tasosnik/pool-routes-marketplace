@@ -1,5 +1,5 @@
 import { BaseModel } from './BaseModel';
-import { User as IUser, UserRole } from '@shared/types';
+import { User as IUser, UserRole } from '../types';
 import bcrypt from 'bcryptjs';
 
 export class User extends BaseModel {

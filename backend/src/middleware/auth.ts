@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { verifyAccessToken, extractTokenFromHeader } from '../utils/jwt';
 import { User } from '../models/User';
-import { UserRole } from '@shared/types';
+import { UserRole } from '../types';
 
 // Extend Express Request interface to include user
 declare global {

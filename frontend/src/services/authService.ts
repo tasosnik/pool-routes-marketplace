@@ -1,7 +1,7 @@
 import axios, { AxiosResponse } from 'axios'
-import { ApiResponse, User } from '@shared/types'
+import { ApiResponse, User } from '../types'
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
+const API_BASE_URL = (import.meta as any).env.VITE_API_URL || 'http://localhost:3001'
 
 // Create axios instance
 const api = axios.create({
@@ -69,14 +69,12 @@ export interface LoginResponse {
 }
 
 export class AuthService {
-  private token: string | null = null
-
-  setToken(token: string) {
-    this.token = token
+  setToken(_token: string) {
+    // Token is managed via localStorage and interceptors
   }
 
   clearToken() {
-    this.token = null
+    // Token is managed via localStorage and interceptors
   }
 
   async login(credentials: LoginRequest): Promise<ApiResponse<LoginResponse>> {
