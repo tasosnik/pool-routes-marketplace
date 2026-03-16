@@ -1,0 +1,192 @@
+You are acting as a senior product engineer, product architect, and technical founder. Your job is not just to plan, but to actually build.
+
+Objective:
+Design and implement a high-quality local-first prototype of “PoolRoute OS,” a mobile-friendly software platform for buying, integrating, operating, and analyzing pool service routes. The highest-priority user outcomes are:
+
+1. A user can upload or enter their existing routes/accounts.
+2. A user can evaluate a route for sale and visualize how it fits into their existing portfolio.
+
+Everything else is secondary to those two outcomes.
+
+Use plan mode for architecture, roadmap, tradeoff decisions, and major refactors. After planning, switch into implementation and keep the product runnable locally at all times.
+
+Working style and execution requirements:
+- Do not stop at analysis or planning.
+- Continue iterating until you have built a working product, not just documents or mockups.
+- After each meaningful implementation step, reflect on what you built, identify the biggest weaknesses or missing pieces, and continue iterating.
+- Keep going until the result is coherent, usable, and locally testable.
+- Prefer shipping a narrower but working product over a broader but incomplete one.
+- Make reasonable assumptions when needed and document them.
+- Do not wait for approval between steps unless blocked by a hard external dependency.
+
+Mandatory workflow:
+1. First, understand the product and produce:
+   - a concise product brief,
+   - a phased roadmap (MVP, V1, V2+),
+   - a technical architecture,
+   - a prioritized backlog broken into implementation tickets similar to Jira stories.
+2. Then immediately start implementation.
+3. Build incrementally in vertical slices so that the product becomes runnable as early as possible.
+4. After each slice:
+   - test what you built,
+   - fix obvious issues,
+   - reflect on quality, UX, architecture, and gaps,
+   - then continue building.
+5. Once something meaningful works locally:
+   - commit changes clearly,
+   - push to Git,
+   - open/update a PR if appropriate,
+   - then continue iterating with additional improvements.
+6. Repeat this cycle until the product is solid.
+
+Environment and setup:
+- Create virtual environments if needed.
+- Install dependencies cleanly and isolate them properly.
+- Prefer reproducible setup with clear commands.
+- The final result must run locally for testing by a developer with minimal friction.
+- Include:
+   - setup instructions,
+   - local run instructions,
+   - test instructions,
+   - any seed/demo data needed to exercise the main flows.
+- If a backend, frontend, database, or worker is needed, wire them so they can all be run locally.
+- If useful, use Docker/docker-compose, but only if it improves local reproducibility rather than adding unnecessary complexity.
+
+Git and GitHub requirements:
+- Use GitHub CLI (`gh`) commands where useful.
+- Create a new repository if one does not already exist.
+- Organize work with sensible branching.
+- Push commits regularly.
+- Open PRs to the remote as meaningful milestones are reached.
+- Write clear commit messages and PR descriptions.
+- Do not leave work uncommitted locally unless there is a specific reason.
+
+Product requirements:
+
+Product name:
+PoolRoute OS
+
+Core concept:
+A trusted, mobile-friendly operating system and marketplace for pool service routes, where operators can upload current routes, evaluate routes for acquisition, visualize overlap and operational fit, and eventually manage post-acquisition service operations.
+
+Primary priority:
+The user should be able to:
+1. upload/import their existing routes,
+2. visualize those routes on a map,
+3. import or evaluate a route for sale,
+4. see what their portfolio would look like if they acquired that route.
+
+Secondary capabilities:
+A. Route Marketplace
+- Sellers can list routes for sale.
+- Routes may include account count, geography, revenue, service notes, payment history, and churn history.
+- Buyers can evaluate listings with more trust and structure than brokers/Facebook groups.
+- Escrow and tranche logic should be considered in architecture, even if mocked in MVP.
+
+Example:
+A seller posts 30 accounts in Pasadena generating $45K/year. A buyer sees 12 months of payment history and service logs, pays through escrow, and retention is tracked before funds are fully released.
+
+B. Integration of New Routes into Existing Portfolio
+- Users can upload existing routes/accounts into their account.
+- Inputs may include:
+  - manual text entry,
+  - CSV,
+  - PDF parsing,
+  - image/photo OCR,
+  - possibly voice memo transcription if appropriate.
+- Users can visualize existing routes on a map.
+- Users can upload or load a candidate acquisition route and compare:
+  - geography,
+  - overlap,
+  - drive-time implications,
+  - portfolio composition after acquisition.
+
+This is the most important feature area.
+
+C. Service Operations Management
+- Route scheduling and optimization.
+- Mobile-friendly technician workflow.
+- Checklists, chemical logs, photo capture.
+- Customer communication after service.
+- Pricing intelligence / underpriced account nudges.
+
+D. Post-Sale Retention & Guarantees
+- Track retention after acquisition.
+- Detect churn signals such as cancellations, complaints, or payment failures.
+- Support escrow adjustment/refund logic if churn exceeds thresholds.
+
+E. Financial Analytics & Valuation
+- Automated route valuation model.
+- Dashboard for MRR/revenue, cost ratios, productivity.
+- Exportable P&L/reporting.
+
+F. Future extensibility
+- The architecture should make it possible to extend later into adjacent route-based service industries, especially commercial landscaping.
+
+Product examples to keep in mind:
+1. Route marketplace:
+A seller lists 30 accounts in Pasadena generating $45K/year. Buyer sees payment history and service logs. Buyer pays $150K via escrow. Retention is tracked and funds are released in tranches.
+
+2. Route integration:
+A buyer uploads their current accounts, then uploads a target acquisition route, and sees both on a map with overlap, density, and operational impact.
+
+3. Service operations:
+A tech gets an optimized daily list with pool checklists, chemical logs, photos, and completion notifications to homeowners.
+
+4. Retention guarantee:
+If acquired accounts churn in the first 60–90 days, payout adjustments are triggered based on pre-defined rules.
+
+Output and implementation expectations:
+- Choose an appropriate tech stack and explain why.
+- Favor a practical, modern stack that supports:
+  - mobile-friendly UI,
+  - mapping/geospatial visualization,
+  - structured imports,
+  - analytics,
+  - local development speed.
+- Think in terms of a real startup-quality prototype, not just a toy.
+- Prefer strong defaults over too many options.
+
+Suggested decision framework:
+- What is the smallest believable MVP that demonstrates the core value?
+- What architecture supports quick iteration now without blocking future scale?
+- Which parts should be real in MVP, and which should be mocked/stubbed?
+- How can local testing feel realistic with demo data?
+
+MVP should likely include at minimum:
+- authentication or a lightweight placeholder auth flow,
+- route/account data model,
+- existing-route import flow,
+- candidate-route import/listing flow,
+- map visualization of current portfolio and candidate acquisition,
+- side-by-side or overlay analysis,
+- basic dashboard metrics,
+- mobile-friendly UI,
+- demo dataset and local instructions.
+
+Quality bar:
+- Build something coherent, polished, and navigable.
+- Avoid half-built scaffolding with many dead screens.
+- Ensure the key workflows actually work.
+- Make the UX understandable for a non-technical small business owner.
+- Keep the architecture maintainable.
+
+Reflection loop requirement:
+At each milestone, explicitly ask:
+- What works already?
+- What is still fake, fragile, confusing, or low-quality?
+- What is the highest-leverage next improvement?
+Then implement that improvement.
+
+Definition of done:
+Do not stop when you merely have a plan.
+Stop only when:
+- there is a working local product,
+- the core upload + portfolio visualization workflow is functional,
+- the repo is pushed to GitHub,
+- commits/PRs are created,
+- setup instructions are present,
+- and you have completed at least several rounds of reflection-driven improvement after the first working version.
+
+Initial task:
+Start by producing the product brief, phased roadmap, architecture, and prioritized implementation backlog. Then immediately begin building the MVP and continue iterating until the product is genuinely usable locally.
