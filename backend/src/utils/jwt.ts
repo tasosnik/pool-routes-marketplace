@@ -1,26 +1,13 @@
 import jwt, { SignOptions, JwtPayload as BaseJwtPayload } from 'jsonwebtoken';
-import crypto from 'crypto';
 import { User as IUser } from '../types';
+import { initializeEnvironment } from './env-validation';
 
-// Utility function to generate a secure random secret
-export const generateSecureSecret = (): string => {
-  return crypto.randomBytes(64).toString('hex');
-};
+// Initialize and validate environment
+const env = initializeEnvironment();
 
-// Validate JWT secret is provided
-if (!process.env.JWT_SECRET) {
-  const suggestedSecret = generateSecureSecret();
-  throw new Error(
-    '🔐 JWT_SECRET environment variable is required!\n\n' +
-    'Add this to your .env file:\n' +
-    `JWT_SECRET=${suggestedSecret}\n\n` +
-    '⚠️  NEVER use a weak secret in production!'
-  );
-}
-
-const JWT_SECRET = process.env.JWT_SECRET;
-const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d';
-const JWT_REFRESH_EXPIRES_IN = process.env.JWT_REFRESH_EXPIRES_IN || '30d';
+const JWT_SECRET = env.JWT_SECRET;
+const JWT_EXPIRES_IN = env.JWT_EXPIRES_IN || '7d';
+const JWT_REFRESH_EXPIRES_IN = env.JWT_REFRESH_EXPIRES_IN || '30d';
 
 export interface JWTPayload extends BaseJwtPayload {
   userId: string;

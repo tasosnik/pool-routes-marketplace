@@ -1,11 +1,16 @@
 import dotenv from 'dotenv';
+import path from 'path';
+
+// Load environment variables FIRST before any other imports - restart trigger
+dotenv.config({ path: path.join(__dirname, '../../.env') });
+
 import app from './app';
 import { initializeDatabase, closeConnection } from './models';
+import { initializeEnvironment } from './utils/env-validation';
 
-// Load environment variables
-dotenv.config();
-
-const PORT = process.env.PORT || 3001;
+// Validate environment configuration on startup
+const env = initializeEnvironment();
+const PORT = env.PORT;
 
 // Graceful shutdown handler
 const gracefulShutdown = async (signal: string) => {
