@@ -26,9 +26,14 @@ export class PoolAccount extends BaseModel {
     specialRequirements?: string;
     startDate: Date;
   }): Promise<IPoolAccount> {
+    // Standardize coordinates as JSON string
     const coordinates = accountData.address.coordinates ?
-      `POINT(${accountData.address.coordinates.longitude} ${accountData.address.coordinates.latitude})` :
+      JSON.stringify(accountData.address.coordinates) :
       null;
+
+    // Extract lat/lng for efficient searching
+    const coordinatesLat = accountData.address.coordinates?.latitude || null;
+    const coordinatesLng = accountData.address.coordinates?.longitude || null;
 
     const account = await this.create({
       route_id: accountData.routeId,
@@ -41,6 +46,8 @@ export class PoolAccount extends BaseModel {
       zip_code: accountData.address.zipCode,
       country: accountData.address.country || 'USA',
       coordinates,
+      coordinates_lat: coordinatesLat,
+      coordinates_lng: coordinatesLng,
       service_type: accountData.serviceType,
       frequency: accountData.frequency,
       monthly_rate: accountData.monthlyRate,
@@ -54,6 +61,60 @@ export class PoolAccount extends BaseModel {
 
     // Update route statistics
     await Route.updateRouteStats(accountData.routeId);
+
+    return this.mapToPoolAccount(account);
+  }
+
+  static async createAccountInTransaction(accountData: {
+    routeId: string;
+    customerName: string;
+    customerEmail?: string;
+    customerPhone?: string;
+    address: Address;
+    serviceType: ServiceType;
+    frequency: ServiceFrequency;
+    monthlyRate: number;
+    poolType?: PoolType;
+    poolSize?: PoolSize;
+    equipmentNotes?: string;
+    accessInstructions?: string;
+    specialRequirements?: string;
+    startDate: Date;
+  }, trx: any): Promise<IPoolAccount> {
+    // Standardize coordinates as JSON string
+    const coordinates = accountData.address.coordinates ?
+      JSON.stringify(accountData.address.coordinates) :
+      null;
+
+    // Extract lat/lng for efficient searching
+    const coordinatesLat = accountData.address.coordinates?.latitude || null;
+    const coordinatesLng = accountData.address.coordinates?.longitude || null;
+
+    const [account] = await trx('pool_accounts').insert({
+      route_id: accountData.routeId,
+      customer_name: accountData.customerName,
+      customer_email: accountData.customerEmail,
+      customer_phone: accountData.customerPhone,
+      street: accountData.address.street,
+      city: accountData.address.city,
+      state: accountData.address.state,
+      zip_code: accountData.address.zipCode,
+      country: accountData.address.country || 'USA',
+      coordinates,
+      coordinates_lat: coordinatesLat,
+      coordinates_lng: coordinatesLng,
+      service_type: accountData.serviceType,
+      frequency: accountData.frequency,
+      monthly_rate: accountData.monthlyRate,
+      pool_type: accountData.poolType || PoolType.CHLORINE,
+      pool_size: accountData.poolSize,
+      equipment_notes: accountData.equipmentNotes,
+      access_instructions: accountData.accessInstructions,
+      special_requirements: accountData.specialRequirements,
+      start_date: accountData.startDate,
+      created_at: new Date(),
+      updated_at: new Date()
+    }).returning('*');
 
     return this.mapToPoolAccount(account);
   }
@@ -135,10 +196,21 @@ export class PoolAccount extends BaseModel {
     }
 
     if (filters.location && filters.radiusInMiles) {
-      const point = `POINT(${filters.location.longitude} ${filters.location.latitude})`;
+      // Use Haversine formula for distance calculation without PostGIS
       query = query.whereRaw(
-        'ST_DWithin(coordinates, ST_GeogFromText(?), ?)',
-        [point, filters.radiusInMiles * 1609.34] // Convert miles to meters
+        `(
+          6371 * acos(
+            cos(radians(?)) * cos(radians(coordinates_lat)) *
+            cos(radians(coordinates_lng) - radians(?)) +
+            sin(radians(?)) * sin(radians(coordinates_lat))
+          )
+        ) <= ?`,
+        [
+          filters.location.latitude,
+          filters.location.longitude,
+          filters.location.latitude,
+          filters.radiusInMiles / 0.621371 // Convert miles to kilometers for Haversine
+        ]
       );
     }
 
@@ -209,7 +281,7 @@ export class PoolAccount extends BaseModel {
       state: dbAccount.state,
       zipCode: dbAccount.zip_code,
       country: dbAccount.country,
-      coordinates: dbAccount.coordinates ? this.parseCoordinates(dbAccount.coordinates) : undefined
+      coordinates: this.extractCoordinates(dbAccount)
     };
 
     return {
@@ -238,14 +310,28 @@ export class PoolAccount extends BaseModel {
     };
   }
 
-  private static parseCoordinates(postgisPoint: string): { latitude: number; longitude: number } {
-    // Parse PostGIS POINT to coordinate
-    const match = postgisPoint.match(/POINT\((.+) (.+)\)/);
-    if (!match) return { latitude: 0, longitude: 0 };
+  private static extractCoordinates(dbAccount: Record<string, any>): { latitude: number; longitude: number } | undefined {
+    // Use computed lat/lng columns if available
+    if (dbAccount.coordinates_lat !== null && dbAccount.coordinates_lng !== null) {
+      return {
+        latitude: parseFloat(dbAccount.coordinates_lat),
+        longitude: parseFloat(dbAccount.coordinates_lng)
+      };
+    }
 
-    return {
-      latitude: parseFloat(match[2]),
-      longitude: parseFloat(match[1])
-    };
+    // Fall back to JSON coordinates column
+    if (dbAccount.coordinates) {
+      try {
+        if (typeof dbAccount.coordinates === 'string') {
+          const parsed = JSON.parse(dbAccount.coordinates);
+          return parsed;
+        }
+        return dbAccount.coordinates;
+      } catch (error) {
+        console.error('Error parsing coordinates JSON:', error);
+      }
+    }
+
+    return undefined;
   }
 }

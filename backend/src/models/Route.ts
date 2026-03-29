@@ -15,9 +15,13 @@ export class Route extends BaseModel {
     description?: string;
     serviceArea: ServiceArea;
   }): Promise<IRoute> {
-    // Convert coordinates to PostGIS format
-    const boundaries = this.coordinatesToPostGIS(routeData.serviceArea.boundaries);
-    const centerPoint = this.pointToPostGIS(routeData.serviceArea.centerPoint);
+    // Standardize coordinates as JSON strings
+    const boundaries = JSON.stringify(routeData.serviceArea.boundaries);
+    const centerPoint = JSON.stringify(routeData.serviceArea.centerPoint);
+
+    // Extract lat/lng for efficient searching
+    const centerLat = routeData.serviceArea.centerPoint.latitude;
+    const centerLng = routeData.serviceArea.centerPoint.longitude;
 
     const route = await this.create({
       owner_id: routeData.ownerId,
@@ -26,6 +30,8 @@ export class Route extends BaseModel {
       service_area_name: routeData.serviceArea.name,
       service_area_boundaries: boundaries,
       service_area_center: centerPoint,
+      service_area_center_lat: centerLat,
+      service_area_center_lng: centerLng,
       service_area_radius: routeData.serviceArea.radius
     });
 
@@ -91,11 +97,21 @@ export class Route extends BaseModel {
     }
 
     if (filters?.location && filters?.radiusInMiles) {
-      // Use PostGIS for spatial filtering
-      const point = this.pointToPostGIS(filters.location);
+      // Use Haversine formula for distance calculation without PostGIS
       query = query.whereRaw(
-        'ST_DWithin(service_area_center, ST_GeogFromText(?), ?)',
-        [point, filters.radiusInMiles * 1609.34] // Convert miles to meters
+        `(
+          6371 * acos(
+            cos(radians(?)) * cos(radians(service_area_center_lat)) *
+            cos(radians(service_area_center_lng) - radians(?)) +
+            sin(radians(?)) * sin(radians(service_area_center_lat))
+          )
+        ) <= ?`,
+        [
+          filters.location.latitude,
+          filters.location.longitude,
+          filters.location.latitude,
+          filters.radiusInMiles / 0.621371 // Convert miles to kilometers for Haversine
+        ]
       );
     }
 
@@ -114,47 +130,55 @@ export class Route extends BaseModel {
     return mappedRoute;
   }
 
-  // Helper methods for PostGIS conversion
-  private static coordinatesToPostGIS(coordinates: Coordinates[]): string {
-    const points = coordinates.map(coord => `${coord.longitude} ${coord.latitude}`).join(',');
-    return `POLYGON((${points}))`;
+
+  private static extractBoundaries(dbRoute: Record<string, any>): Coordinates[] {
+    // Parse JSON boundaries column
+    if (dbRoute.service_area_boundaries) {
+      try {
+        if (typeof dbRoute.service_area_boundaries === 'string') {
+          const parsed = JSON.parse(dbRoute.service_area_boundaries);
+          return Array.isArray(parsed) ? parsed : [];
+        }
+        return Array.isArray(dbRoute.service_area_boundaries) ? dbRoute.service_area_boundaries : [];
+      } catch (error) {
+        console.error('Error parsing boundaries JSON:', error);
+      }
+    }
+
+    return [];
   }
 
-  private static pointToPostGIS(coord: Coordinates): string {
-    return `POINT(${coord.longitude} ${coord.latitude})`;
-  }
+  private static extractCenterPoint(dbRoute: Record<string, any>): Coordinates {
+    // Use computed lat/lng columns if available
+    if (dbRoute.service_area_center_lat !== null && dbRoute.service_area_center_lng !== null) {
+      return {
+        latitude: parseFloat(dbRoute.service_area_center_lat),
+        longitude: parseFloat(dbRoute.service_area_center_lng)
+      };
+    }
 
-  private static postGISToCoordinates(postgisPolygon: string): Coordinates[] {
-    // Parse PostGIS POLYGON to coordinates array
-    // This is a simplified parser - in production, use a proper PostGIS library
-    const match = postgisPolygon.match(/POLYGON\(\((.+)\)\)/);
-    if (!match) return [];
+    // Fall back to JSON center column
+    if (dbRoute.service_area_center) {
+      try {
+        if (typeof dbRoute.service_area_center === 'string') {
+          const parsed = JSON.parse(dbRoute.service_area_center);
+          return parsed;
+        }
+        return dbRoute.service_area_center;
+      } catch (error) {
+        console.error('Error parsing center point JSON:', error);
+      }
+    }
 
-    return match[1].split(',').map(point => {
-      const [lng, lat] = point.trim().split(' ');
-      return { latitude: parseFloat(lat), longitude: parseFloat(lng) };
-    });
-  }
-
-  private static postGISToPoint(postgisPoint: string): Coordinates {
-    // Parse PostGIS POINT to coordinate
-    const match = postgisPoint.match(/POINT\((.+) (.+)\)/);
-    if (!match) return { latitude: 0, longitude: 0 };
-
-    return {
-      latitude: parseFloat(match[2]),
-      longitude: parseFloat(match[1])
-    };
+    return { latitude: 0, longitude: 0 };
   }
 
   // Map database record to Route interface
   private static mapToRoute(dbRoute: Record<string, any>): IRoute {
     const serviceArea: ServiceArea = {
       name: dbRoute.service_area_name,
-      boundaries: dbRoute.service_area_boundaries ?
-        this.postGISToCoordinates(dbRoute.service_area_boundaries) : [],
-      centerPoint: dbRoute.service_area_center ?
-        this.postGISToPoint(dbRoute.service_area_center) : { latitude: 0, longitude: 0 },
+      boundaries: this.extractBoundaries(dbRoute),
+      centerPoint: this.extractCenterPoint(dbRoute),
       radius: dbRoute.service_area_radius
     };
 
