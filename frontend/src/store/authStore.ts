@@ -3,9 +3,13 @@ import { persist } from 'zustand/middleware'
 import { User } from '../types'
 import { authService } from '../services/authService'
 
+// Note: This store maintains state management while React Query handles API caching and data fetching
+// The hooks in useAuth.ts provide React Query integration for components
+
 interface AuthState {
   user: User | null
   token: string | null
+  refreshToken: string | null
   isAuthenticated: boolean
   isLoading: boolean
 }
@@ -34,6 +38,7 @@ export const useAuthStore = create<AuthStore>()(
       // State
       user: null,
       token: null,
+      refreshToken: null,
       isAuthenticated: false,
       isLoading: true,
 
@@ -48,6 +53,7 @@ export const useAuthStore = create<AuthStore>()(
             set({
               user: response.data.user,
               token: response.data.tokens.accessToken,
+              refreshToken: response.data.tokens.refreshToken,
               isAuthenticated: true,
               isLoading: false
             })
@@ -75,6 +81,7 @@ export const useAuthStore = create<AuthStore>()(
             set({
               user: response.data.user,
               token: response.data.tokens.accessToken,
+              refreshToken: response.data.tokens.refreshToken,
               isAuthenticated: true,
               isLoading: false
             })
@@ -96,6 +103,7 @@ export const useAuthStore = create<AuthStore>()(
         set({
           user: null,
           token: null,
+          refreshToken: null,
           isAuthenticated: false,
           isLoading: false
         })
@@ -164,6 +172,7 @@ export const useAuthStore = create<AuthStore>()(
       partialize: (state) => ({
         user: state.user,
         token: state.token,
+        refreshToken: state.refreshToken,
         isAuthenticated: state.isAuthenticated
       })
     }

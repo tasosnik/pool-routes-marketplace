@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { Eye, EyeOff, MapPin } from 'lucide-react'
 import { useAuthStore } from '../../store/authStore'
+import { useLogin } from '../../hooks/useAuth'
 import toast from 'react-hot-toast'
 
 interface LoginForm {
@@ -12,9 +13,14 @@ interface LoginForm {
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
-  const { login, isAuthenticated, isLoading } = useAuthStore()
+  const [rememberMe, setRememberMe] = useState(false)
+  const [showForgotPasswordModal, setShowForgotPasswordModal] = useState(false)
+  const { isAuthenticated, isLoading } = useAuthStore()
   const navigate = useNavigate()
   const location = useLocation()
+
+  // React Query hook for login
+  const loginMutation = useLogin()
 
   // Get the intended destination or default to dashboard
   const from = (location.state as any)?.from?.pathname || '/dashboard'
@@ -32,18 +38,27 @@ export default function LoginPage() {
     }
   }, [isAuthenticated, navigate, from])
 
+  // Load remembered preferences on mount
+  useEffect(() => {
+    const remembered = localStorage.getItem('rememberMe') === 'true'
+    setRememberMe(remembered)
+  }, [])
+
   const onSubmit = async (data: LoginForm) => {
     try {
-      const result = await login(data.email, data.password)
+      await loginMutation.mutateAsync(data)
 
-      if (result.success) {
-        toast.success('Welcome back!')
-        navigate(from, { replace: true })
+      // If remember me is checked, store email for next time
+      if (rememberMe) {
+        localStorage.setItem('rememberedEmail', data.email)
       } else {
-        toast.error(result.error || 'Login failed')
+        localStorage.removeItem('rememberedEmail')
       }
+
+      navigate(from, { replace: true })
     } catch (error) {
-      toast.error('An unexpected error occurred')
+      // Error handling is done in the hook
+      console.error('Login error:', error)
     }
   }
 
@@ -99,6 +114,7 @@ export default function LoginPage() {
                   type="email"
                   id="email"
                   autoComplete="email"
+                  defaultValue={localStorage.getItem('rememberedEmail') || ''}
                   className={`form-input ${errors.email ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : ''}`}
                   placeholder="Enter your email"
                 />
@@ -149,6 +165,12 @@ export default function LoginPage() {
                     id="remember-me"
                     name="remember-me"
                     type="checkbox"
+                    checked={rememberMe}
+                    onChange={(e) => {
+                      setRememberMe(e.target.checked)
+                      // Store preference in localStorage
+                      localStorage.setItem('rememberMe', e.target.checked.toString())
+                    }}
                     className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
                   />
                   <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
@@ -157,19 +179,26 @@ export default function LoginPage() {
                 </div>
 
                 <div className="text-sm">
-                  <a href="#" className="font-medium text-primary-600 hover:text-primary-500">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault()
+                      setShowForgotPasswordModal(true)
+                    }}
+                    className="font-medium text-primary-600 hover:text-primary-500"
+                  >
                     Forgot your password?
-                  </a>
+                  </button>
                 </div>
               </div>
 
               <div>
                 <button
                   type="submit"
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || loginMutation.isPending}
                   className="w-full btn btn-primary"
                 >
-                  {isSubmitting ? (
+                  {(isSubmitting || loginMutation.isPending) ? (
                     <>
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
                       Signing in...
@@ -203,6 +232,66 @@ export default function LoginPage() {
           </div>
         </div>
       </div>
+
+      {/* Forgot Password Modal */}
+      {showForgotPasswordModal && (
+        <div className="fixed inset-0 z-50 overflow-y-auto">
+          <div className="flex min-h-screen items-center justify-center p-4">
+            <div className="fixed inset-0 bg-black bg-opacity-50" onClick={() => setShowForgotPasswordModal(false)} />
+
+            <div className="relative bg-white rounded-lg shadow-xl max-w-md w-full">
+              <div className="p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                  Reset Your Password
+                </h3>
+                <p className="text-gray-600 mb-6">
+                  Enter your email address and we'll send you instructions to reset your password.
+                </p>
+
+                <form onSubmit={(e) => {
+                  e.preventDefault()
+                  const formData = new FormData(e.currentTarget)
+                  const email = formData.get('reset-email') as string
+
+                  // TODO: Implement actual password reset
+                  toast(`Password reset instructions would be sent to ${email}`)
+                  setShowForgotPasswordModal(false)
+                }}>
+                  <div className="mb-4">
+                    <label htmlFor="reset-email" className="block text-sm font-medium text-gray-700 mb-1">
+                      Email address
+                    </label>
+                    <input
+                      type="email"
+                      id="reset-email"
+                      name="reset-email"
+                      required
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                      placeholder="Enter your email"
+                    />
+                  </div>
+
+                  <div className="flex gap-3 justify-end">
+                    <button
+                      type="button"
+                      onClick={() => setShowForgotPasswordModal(false)}
+                      className="btn btn-outline"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="btn btn-primary"
+                    >
+                      Send Reset Instructions
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
