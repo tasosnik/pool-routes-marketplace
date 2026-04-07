@@ -10,7 +10,7 @@ interface ListingMapProps {
   accounts?: PoolAccount[]
 }
 
-export default function ListingMap({ centerLat, centerLng, title, serviceArea, accounts = [] }: ListingMapProps) {
+export default function ListingMap({ centerLat, centerLng, accounts = [] }: ListingMapProps) {
   const accountsWithCoords = accounts.filter(
     (a) => a.address?.coordinates?.latitude && a.address?.coordinates?.longitude
   )
