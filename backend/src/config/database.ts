@@ -20,8 +20,8 @@ const knexConfig: Knex.Config = {
   pool: {
     min: 2,
     max: 10,
-    acquireTimeoutMillis: 10000,
-    createTimeoutMillis: 10000,
+    acquireTimeoutMillis: 30000,
+    createTimeoutMillis: 30000,
     destroyTimeoutMillis: 5000,
     idleTimeoutMillis: 30000,
     reapIntervalMillis: 1000,
@@ -32,7 +32,10 @@ const knexConfig: Knex.Config = {
 
 // Use DATABASE_URL in production if available
 if (process.env.DATABASE_URL) {
-  knexConfig.connection = process.env.DATABASE_URL;
+  knexConfig.connection = {
+    connectionString: process.env.DATABASE_URL,
+    ssl: process.env.DATABASE_URL.includes('localhost') ? false : { rejectUnauthorized: false }
+  };
 }
 
 export const db = knex(knexConfig);
