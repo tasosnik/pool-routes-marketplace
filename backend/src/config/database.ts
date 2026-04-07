@@ -32,10 +32,13 @@ const knexConfig: Knex.Config = {
 
 // Use DATABASE_URL in production if available
 if (process.env.DATABASE_URL) {
-  knexConfig.connection = {
-    connectionString: process.env.DATABASE_URL,
-    ssl: process.env.DATABASE_URL.includes('localhost') ? false : { rejectUnauthorized: false }
-  };
+  const dbUrl = process.env.DATABASE_URL;
+  const isInternal = dbUrl.includes('.railway.internal') || dbUrl.includes('localhost');
+  console.log(`📡 Connecting to database: ${dbUrl.replace(/:[^:@]+@/, ':***@')}`);
+  console.log(`🔒 SSL: ${isInternal ? 'disabled (internal)' : 'enabled'}`);
+  knexConfig.connection = isInternal
+    ? { connectionString: dbUrl, ssl: false }
+    : { connectionString: dbUrl, ssl: { rejectUnauthorized: false } };
 }
 
 export const db = knex(knexConfig);
