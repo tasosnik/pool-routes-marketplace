@@ -1,0 +1,50 @@
+{
+  "user": {
+    "email": "john.smith@example.com",
+    "name": "John Smith",
+    "company": "Crystal Clear Pool Service",
+    "role": "operator"
+  },
+  "route": {
+    "name": "Beverly Hills Premium Route",
+    "description": "High-end residential pool service route covering Beverly Hills 90210 and 90212",
+    "serviceArea": {
+      "center": {
+        "latitude": 34.0736,
+        "longitude": -118.4004
+      },
+      "radius": 2.5
+    },
+    "statistics": {
+      "totalAccounts": 25,
+      "activeAccounts": 25,
+      "monthlyRevenue": 8375,
+      "averageRate": 335,
+      "serviceBreakdown": {
+        "weekly": 20,
+        "biweekly": 3,
+        "monthly": 2
+      },
+      "poolTypes": {
+        "chlorine": 16,
+        "saltwater": 8,
+        "natural": 1
+      },
+      "poolSizes": {
+        "small": 2,
+        "medium": 7,
+        "large": 14,
+        "xlarge": 2
+      }
+    }
+  },
+  "testScenarios": [
+    "Regular weekly service route",
+    "Mix of pool types and sizes",
+    "High-value accounts ($300-400 range)",
+    "Some customers without email (phone only)",
+    "Special instructions and gate codes",
+    "Premium neighborhood demographics"
+  ],
+  "notes": "This is John's primary route. He's been servicing these pools for 3+ years with excellent retention. The route is well-established with minimal churn."
+}

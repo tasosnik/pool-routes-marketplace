@@ -250,11 +250,7 @@ export default function LoginPage() {
 
                 <form onSubmit={(e) => {
                   e.preventDefault()
-                  const formData = new FormData(e.currentTarget)
-                  const email = formData.get('reset-email') as string
-
-                  // TODO: Implement actual password reset
-                  toast(`Password reset instructions would be sent to ${email}`)
+                  toast('Password reset is not yet available. Please contact support at support@poolroute.com')
                   setShowForgotPasswordModal(false)
                 }}>
                   <div className="mb-4">

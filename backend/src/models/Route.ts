@@ -123,9 +123,10 @@ export class Route extends BaseModel {
     const route = await this.findById(routeId);
     if (!route) return null;
 
-    // Get associated accounts (will be implemented in PoolAccount model)
     const mappedRoute = this.mapToRoute(route);
-    mappedRoute.accounts = []; // Will be populated by PoolAccount.findByRouteId()
+    // Use dynamic require to avoid circular dependency (PoolAccount -> Route -> PoolAccount)
+    const { PoolAccount } = await import('./PoolAccount');
+    mappedRoute.accounts = await PoolAccount.findByRouteId(routeId);
 
     return mappedRoute;
   }

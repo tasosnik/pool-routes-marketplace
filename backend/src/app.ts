@@ -8,6 +8,9 @@ import 'express-async-errors'; // Automatically catch async errors
 
 // Import routes
 import authRoutes from './routes/auth';
+import importRoutes from './routes/import';
+import routesRoutes from './routes/routes';
+import marketplaceRoutes from './routes/marketplace';
 
 // Create Express application
 const app: Application = express();
@@ -75,17 +78,47 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 // Health check endpoint
-app.get('/health', (req: Request, res: Response) => {
-  res.json({
+app.get('/health', async (req: Request, res: Response) => {
+  const healthData: any = {
     success: true,
+    status: 'healthy',
     message: 'PoolRoute OS API is running',
     timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV || 'development'
-  });
+    environment: process.env.NODE_ENV || 'development',
+    version: process.env.npm_package_version || '0.1.0',
+    uptime: Math.floor(process.uptime()),
+    memory: {
+      used: Math.round(process.memoryUsage().heapUsed / 1024 / 1024),
+      total: Math.round(process.memoryUsage().heapTotal / 1024 / 1024),
+      rss: Math.round(process.memoryUsage().rss / 1024 / 1024)
+    },
+    services: {
+      api: 'healthy',
+      database: 'unknown'
+    }
+  };
+
+  // Check database connection
+  try {
+    const { testConnection } = require('./config/database');
+    await testConnection();
+    healthData.services.database = 'healthy';
+  } catch (error) {
+    healthData.services.database = 'unhealthy';
+    healthData.status = 'degraded';
+  }
+
+  // Set appropriate status code
+  const statusCode = healthData.status === 'healthy' ? 200 : 503;
+
+  res.status(statusCode).json(healthData);
 });
 
 // API routes
 app.use('/api/auth', authLimiter, authRoutes);
+app.use('/api/import', importRoutes);
+app.use('/api/routes', routesRoutes);
+app.use('/api/marketplace', marketplaceRoutes);
 
 // 404 handler
 app.use('*', (req: Request, res: Response) => {

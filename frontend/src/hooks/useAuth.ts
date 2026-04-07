@@ -92,7 +92,7 @@ export const useLogout = () => {
       queryClient.clear()
       toast.success('Logged out successfully')
     },
-    onError: (error: Error) => {
+    onError: (_error: Error) => {
       // Even if logout fails on server, clear local state
       logout()
       queryClient.clear()

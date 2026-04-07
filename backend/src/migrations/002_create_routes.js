@@ -9,8 +9,8 @@ exports.up = function(knex) {
     table.string('name').notNullable();
     table.text('description');
     table.string('service_area_name').notNullable();
-    table.geometry('service_area_boundaries'); // PostGIS polygon
-    table.point('service_area_center'); // PostGIS point
+    table.text('service_area_boundaries'); // JSON polygon for now
+    table.text('service_area_center'); // JSON point for now
     table.decimal('service_area_radius', 8, 2); // in miles
     table.integer('total_accounts').defaultTo(0);
     table.integer('active_accounts').defaultTo(0);
@@ -25,7 +25,7 @@ exports.up = function(knex) {
     table.index(['owner_id']);
     table.index(['status']);
     table.index(['is_for_sale']);
-    table.index(['service_area_center'], null, 'gist'); // Spatial index
+    table.index(['service_area_center']); // Regular index
   });
 };
 

@@ -22,13 +22,27 @@
     "test": "npm run test:frontend && npm run test:backend",
     "test:frontend": "cd frontend && npm test",
     "test:backend": "cd backend && npm test",
+    "test:e2e": "cd e2e && npm test",
+    "test:e2e:headed": "cd e2e && npm run test:headed",
+    "test:e2e:ui": "cd e2e && npm run test:ui",
+    "test:coverage": "npm run test:coverage:frontend && npm run test:coverage:backend",
+    "test:coverage:frontend": "cd frontend && npm run test:coverage",
+    "test:coverage:backend": "cd backend && npm run test:coverage",
     "lint": "npm run lint:frontend && npm run lint:backend",
     "lint:frontend": "cd frontend && npm run lint",
     "lint:backend": "cd backend && npm run lint",
     "docker:up": "docker-compose up -d",
     "docker:down": "docker-compose down",
     "docker:logs": "docker-compose logs -f",
-    "seed": "cd backend && npm run seed"
+    "seed": "cd backend && npm run seed",
+    "dev:reset": "scripts/dev-reset.sh",
+    "dev:health": "scripts/health-check.sh",
+    "db:reset": "scripts/db-reset.sh",
+    "dev:status": "node scripts/dev-manager.js status",
+    "dev:restart": "node scripts/dev-manager.js restart",
+    "dev:cleanup": "node scripts/dev-manager.js reset",
+    "kill:ports": "node scripts/dev-manager.js kill-ports",
+    "health:check": "node scripts/dev-manager.js health"
   },
   "devDependencies": {
     "concurrently": "^8.2.2"
@@ -38,5 +52,8 @@
     "npm": ">=9.0.0"
   },
   "author": "PoolRoute OS Team",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "pg": "^8.20.0"
+  }
 }

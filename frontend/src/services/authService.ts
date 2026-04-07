@@ -1,7 +1,8 @@
 import axios, { AxiosResponse } from 'axios'
 import { ApiResponse, User } from '../types'
 
-const API_BASE_URL = (import.meta as any).env.VITE_API_URL || 'http://localhost:3001'
+// Use Vite proxy in dev (/api → localhost:3001), allow override for production
+const API_BASE_URL = (import.meta as any).env.VITE_API_URL || ''
 
 // Create axios instance
 const api = axios.create({
@@ -32,15 +33,69 @@ api.interceptors.request.use(
   }
 )
 
-// Response interceptor to handle errors
+// Track ongoing refresh promise to avoid concurrent refresh attempts
+let refreshPromise: Promise<any> | null = null
+
+// Response interceptor to handle token refresh
 api.interceptors.response.use(
   (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      // Token expired or invalid - clear auth and redirect to login
-      localStorage.removeItem('poolroute-auth')
-      window.location.href = '/login'
+  async (error) => {
+    const originalRequest = error.config
+
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true
+
+      try {
+        // Get current auth data
+        const authData = localStorage.getItem('poolroute-auth')
+        if (!authData) {
+          throw new Error('No auth data found')
+        }
+
+        const parsed = JSON.parse(authData)
+        const refreshToken = parsed?.state?.refreshToken
+
+        if (!refreshToken) {
+          throw new Error('No refresh token available')
+        }
+
+        // Use existing refresh promise or create new one
+        if (!refreshPromise) {
+          refreshPromise = authService.refreshToken(refreshToken)
+        }
+
+        const refreshResponse = await refreshPromise
+        refreshPromise = null // Clear the promise
+
+        if (refreshResponse.success && refreshResponse.data?.tokens) {
+          // Update stored tokens
+          const newAuthData = {
+            ...parsed,
+            state: {
+              ...parsed.state,
+              token: refreshResponse.data.tokens.accessToken,
+              refreshToken: refreshResponse.data.tokens.refreshToken
+            }
+          }
+          localStorage.setItem('poolroute-auth', JSON.stringify(newAuthData))
+
+          // Update the original request header
+          originalRequest.headers.Authorization = `Bearer ${refreshResponse.data.tokens.accessToken}`
+
+          // Retry original request
+          return api(originalRequest)
+        } else {
+          throw new Error('Token refresh failed')
+        }
+      } catch (refreshError) {
+        // Refresh failed - clear auth state and let React Router handle redirect
+        console.warn('Token refresh failed:', refreshError)
+        localStorage.removeItem('poolroute-auth')
+        refreshPromise = null
+        return Promise.reject(refreshError)
+      }
     }
+
     return Promise.reject(error)
   }
 )

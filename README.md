@@ -149,6 +149,11 @@ npm run dev
 - `npm run docker:up` - Start Docker stack
 - `npm run docker:down` - Stop Docker stack
 
+### 🔧 Development & Debugging Scripts
+- `npm run dev:health` - Check system health and service status
+- `npm run dev:reset` - Kill processes, reset database, restart services
+- `npm run db:reset` - Reset database with fresh data (safer option)
+
 ### Backend Scripts
 - `npm run dev` - Start development server with nodemon
 - `npm run build` - Build TypeScript to JavaScript
@@ -269,6 +274,104 @@ Ensure these are set in production:
 4. Push to the branch: `git push origin feature/amazing-feature`
 5. Open a Pull Request
 
+## 🔧 Troubleshooting
+
+### Common Issues & Solutions
+
+#### 🚨 Backend Won't Start
+```bash
+# Check if JWT_SECRET is missing
+npm run dev:health
+
+# If JWT_SECRET error appears, add this to your .env file:
+JWT_SECRET=your-secure-secret-key-here
+```
+
+#### 🗄️ Database Connection Issues
+```bash
+# Check if PostgreSQL is running
+npm run dev:health
+
+# Reset database if corrupted
+npm run db:reset
+
+# Manual database setup
+psql -c "CREATE USER poolroute WITH PASSWORD 'development';" postgres
+psql -c "CREATE DATABASE poolroute_dev OWNER poolroute;" postgres
+```
+
+#### 🌐 Port Already in Use
+```bash
+# Quick reset - kills processes and restarts
+npm run dev:reset
+
+# Manual port cleanup
+lsof -ti:3000 | xargs kill -9  # Frontend
+lsof -ti:3001 | xargs kill -9  # Backend
+```
+
+#### 📦 Dependency Issues
+```bash
+# Clean install with dependency reset
+npm run dev:reset --clean-deps
+
+# Manual cleanup
+rm -rf node_modules frontend/node_modules backend/node_modules
+npm install
+```
+
+#### 🔐 Authentication Problems
+```bash
+# Reset demo data
+npm run db:reset
+
+# Test demo login:
+# Email: admin@poolroute.com
+# Password: password123
+```
+
+#### 🧪 Tests Failing
+```bash
+# Run backend tests
+cd backend && npm test
+
+# Run frontend tests
+cd frontend && npm test
+
+# Create test database if missing
+psql -c "CREATE DATABASE poolroute_test OWNER poolroute;" postgres
+```
+
+### 📊 System Health Checks
+
+```bash
+# Quick health check
+npm run dev:health
+
+# Check specific services
+curl http://localhost:3001/health  # Backend
+curl http://localhost:3000         # Frontend
+```
+
+### 🔄 Recovery Procedures
+
+#### Complete System Reset
+```bash
+npm run dev:reset --clean-deps
+```
+
+#### Database Only Reset
+```bash
+npm run db:reset --backup  # Creates backup first
+```
+
+#### Gentle Restart
+```bash
+# Kill processes without data loss
+npm run dev:reset --no-db-reset --no-start
+npm run dev
+```
+
 ## 📝 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
@@ -277,7 +380,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 For support and questions:
 - Create an issue on GitHub
-- Check the documentation in the `docs/` folder
+- Check the troubleshooting section above
+- Run `npm run dev:health` for system diagnostics
 - Review the API documentation at `/health` endpoint
 
 ## 🙏 Acknowledgments
@@ -285,6 +389,7 @@ For support and questions:
 - Built with modern web technologies
 - Inspired by the pool service industry's need for transparency
 - Designed for mobile-first operations
+- Stabilized for reliable development iteration
 
 ---
 

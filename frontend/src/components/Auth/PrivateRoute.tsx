@@ -1,8 +1,9 @@
-import { Navigate, Outlet } from 'react-router-dom'
+import { Navigate, Outlet, useLocation } from 'react-router-dom'
 import { useAuthStore } from '../../store/authStore'
 
 export default function PrivateRoute() {
   const { isAuthenticated, isLoading } = useAuthStore()
+  const location = useLocation()
 
   // Show loading spinner while checking authentication
   if (isLoading) {
@@ -16,9 +17,9 @@ export default function PrivateRoute() {
     )
   }
 
-  // Redirect to login if not authenticated
+  // Redirect to login if not authenticated, preserving the intended destination
   if (!isAuthenticated) {
-    return <Navigate to="/login" replace />
+    return <Navigate to="/login" state={{ from: location }} replace />
   }
 
   // Render protected routes

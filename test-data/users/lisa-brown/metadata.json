@@ -1,0 +1,32 @@
+{
+  "user": {
+    "email": "lisa.brown@example.com",
+    "name": "Lisa Brown",
+    "company": "AquaPro Pool Solutions",
+    "role": "buyer"
+  },
+  "buyerProfile": {
+    "lookingFor": {
+      "locations": ["Pasadena", "Glendale", "Burbank"],
+      "minAccounts": 15,
+      "maxAccounts": 30,
+      "minRevenue": 3000,
+      "maxRevenue": 8000,
+      "priceRange": {
+        "min": 75000,
+        "max": 200000
+      }
+    },
+    "experience": "5 years in pool service industry",
+    "financing": "Pre-approved for acquisition loan",
+    "timeline": "Looking to purchase within 60 days"
+  },
+  "testScenarios": [
+    "Buyer role with no existing routes",
+    "Browsing marketplace listings",
+    "Evaluating route metrics",
+    "Comparing multiple opportunities",
+    "Due diligence workflows"
+  ],
+  "notes": "Lisa is an experienced pool service professional looking to expand her business through acquisition. She has capital ready and is actively evaluating opportunities in the eastern LA area."
+}

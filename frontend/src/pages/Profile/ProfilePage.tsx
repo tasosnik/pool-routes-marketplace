@@ -1,18 +1,15 @@
 import { useState, useEffect } from 'react'
 import { useAuthStore } from '../../store/authStore'
-import { useNavigate } from 'react-router-dom'
 import { UserCircleIcon, BellIcon, ShieldCheckIcon, CreditCardIcon } from '@heroicons/react/24/outline'
-import { useUpdateProfile, useChangePassword, useLogout } from '../../hooks/useAuth'
+import { useUpdateProfile, useChangePassword } from '../../hooks/useAuth'
 import toast from 'react-hot-toast'
 
 export default function ProfilePage() {
   const { user } = useAuthStore()
-  const navigate = useNavigate()
 
   // React Query hooks
   const updateProfileMutation = useUpdateProfile()
   const changePasswordMutation = useChangePassword()
-  const logoutMutation = useLogout()
 
   const [activeTab, setActiveTab] = useState('personal')
   const [isEditing, setIsEditing] = useState(false)
@@ -93,16 +90,12 @@ export default function ProfilePage() {
 
   const handlePreferencesSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    // TODO: Implement actual preferences update
-    toast.success('Preferences saved successfully')
+    toast('Preferences saved locally. Cloud sync coming soon.')
   }
 
-  const handleDeleteAccount = async () => {
+  const handleDeleteAccount = () => {
     if (window.confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
-      // TODO: Implement actual account deletion
-      toast('Account deletion would be processed')
-      await logoutMutation.mutateAsync()
-      navigate('/')
+      toast('Account deletion is not yet available. Please contact support.')
     }
   }
 
@@ -465,70 +458,25 @@ export default function ProfilePage() {
                 <div>
                   <h2 className="text-xl font-semibold text-gray-900 mb-6">Billing Information</h2>
 
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6">
+                    <h3 className="text-base font-medium text-blue-900 mb-2">Billing Not Yet Available</h3>
+                    <p className="text-sm text-blue-800">
+                      PoolRoute OS is currently in early access. Billing and subscription management
+                      will be available in a future release. Your account currently has full access at no charge.
+                    </p>
+                  </div>
+
                   <div className="bg-gray-50 p-6 rounded-lg mb-6">
                     <h3 className="text-base font-medium text-gray-900 mb-2">Current Plan</h3>
-                    <p className="text-2xl font-bold text-primary-600">Professional</p>
-                    <p className="text-sm text-gray-600 mt-1">$99/month • Unlimited routes</p>
+                    <p className="text-2xl font-bold text-primary-600">Early Access</p>
+                    <p className="text-sm text-gray-600 mt-1">Full access • No payment required</p>
                   </div>
 
-                  <div className="mb-6">
-                    <h3 className="text-base font-medium text-gray-900 mb-4">Payment Method</h3>
-                    <div className="border rounded-lg p-4">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-sm font-medium text-gray-900">•••• •••• •••• 4242</p>
-                          <p className="text-sm text-gray-600">Expires 12/24</p>
-                        </div>
-                        <button
-                          onClick={() => toast('Payment method update coming soon')}
-                          className="btn btn-outline btn-sm"
-                        >
-                          Update
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="mb-6">
-                    <h3 className="text-base font-medium text-gray-900 mb-4">Billing History</h3>
-                    <div className="border rounded-lg overflow-hidden">
-                      <table className="w-full">
-                        <thead className="bg-gray-50">
-                          <tr>
-                            <th className="px-4 py-3 text-left text-sm font-medium text-gray-900">Date</th>
-                            <th className="px-4 py-3 text-left text-sm font-medium text-gray-900">Description</th>
-                            <th className="px-4 py-3 text-right text-sm font-medium text-gray-900">Amount</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y">
-                          <tr>
-                            <td className="px-4 py-3 text-sm text-gray-600">Mar 1, 2026</td>
-                            <td className="px-4 py-3 text-sm text-gray-600">Professional Plan</td>
-                            <td className="px-4 py-3 text-sm text-gray-900 text-right">$99.00</td>
-                          </tr>
-                          <tr>
-                            <td className="px-4 py-3 text-sm text-gray-600">Feb 1, 2026</td>
-                            <td className="px-4 py-3 text-sm text-gray-600">Professional Plan</td>
-                            <td className="px-4 py-3 text-sm text-gray-900 text-right">$99.00</td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-
-                  <div>
-                    <button
-                      onClick={() => toast('Plan upgrade coming soon')}
-                      className="btn btn-primary mr-3"
-                    >
-                      Upgrade Plan
-                    </button>
-                    <button
-                      onClick={() => toast('Download invoice coming soon')}
-                      className="btn btn-outline"
-                    >
-                      Download Invoices
-                    </button>
+                  <div className="text-sm text-gray-500">
+                    For questions about billing or your account, contact{' '}
+                    <a href="mailto:support@poolroute.com" className="text-primary-600 hover:underline">
+                      support@poolroute.com
+                    </a>
                   </div>
                 </div>
               )}

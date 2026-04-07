@@ -191,3 +191,42 @@ export interface ImportWarning {
   value: string;
   message: string;
 }
+
+// Marketplace Types
+export interface RouteListing {
+  id: string;
+  routeId: string;
+  sellerId: string;
+  title: string;
+  description: string;
+  askingPrice: number;
+  accountCount: number;
+  monthlyRevenue: number;
+  revenueMultiple: number;
+  retentionRate: number;
+  averageAccountAge: number;
+  equipmentIncluded: boolean;
+  customerTransition: boolean;
+  escrowPeriod: number;
+  retentionGuaranteePercentage: number;
+  retentionGuaranteePeriod: number;
+  retentionPenaltyRate: number;
+  images?: string[];
+  documents?: string[];
+  status: ListingStatus;
+  listedAt?: Date;
+  createdAt: Date;
+  updatedAt: Date;
+  // Joined data (using any for flexible partial data)
+  route?: any;
+  seller?: any;
+}
+
+export enum ListingStatus {
+  DRAFT = 'draft',
+  ACTIVE = 'active',
+  PENDING = 'pending',
+  IN_ESCROW = 'in_escrow',
+  SOLD = 'sold',
+  WITHDRAWN = 'withdrawn'
+}

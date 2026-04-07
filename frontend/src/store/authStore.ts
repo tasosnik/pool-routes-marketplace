@@ -139,9 +139,15 @@ export const useAuthStore = create<AuthStore>()(
         const { token } = get()
 
         if (token) {
-          // Verify token is still valid
+          // Verify token is still valid by fetching the user profile
           authService.setToken(token)
-          authService.verifyToken()
+
+          // Timeout to prevent hanging forever
+          const timeout = new Promise<never>((_, reject) =>
+            setTimeout(() => reject(new Error('Auth init timeout')), 5000)
+          )
+
+          Promise.race([authService.getProfile(), timeout])
             .then((response) => {
               if (response.success && response.data?.user) {
                 set({
@@ -157,6 +163,10 @@ export const useAuthStore = create<AuthStore>()(
             .catch(() => {
               // Token verification failed, clear auth state
               get().logout()
+            })
+            .finally(() => {
+              // Guarantee loading is always cleared
+              set({ isLoading: false })
             })
         } else {
           set({ isLoading: false })

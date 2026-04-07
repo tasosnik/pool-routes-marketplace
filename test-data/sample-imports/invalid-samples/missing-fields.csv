@@ -1,0 +1,9 @@
+customer_name,street,city,state,zip,email,phone,service_type,frequency,monthly_rate,pool_type,pool_size,notes
+"Missing Street","","Los Angeles","CA","90001","test@email.com","213-555-0001","weekly","weekly","200","chlorine","medium","Should fail - no street"
+"Missing City","123 Test St","","CA","90002","test@email.com","213-555-0002","weekly","weekly","225","saltwater","large","Should fail - no city"
+"Missing State","456 Test Ave","Los Angeles","","90003","test@email.com","213-555-0003","weekly","weekly","175","chlorine","medium","Should fail - no state"
+"Missing ZIP","789 Test Dr","Los Angeles","CA","","test@email.com","213-555-0004","weekly","weekly","250","chlorine","large","Should fail - no ZIP"
+"","321 Test Blvd","Los Angeles","CA","90005","test@email.com","213-555-0005","weekly","weekly","200","saltwater","medium","Should fail - no customer name"
+"Missing Rate","654 Test Ln","Los Angeles","CA","90006","test@email.com","213-555-0006","weekly","weekly","","chlorine","small","Should fail - no monthly rate"
+"Invalid Rate","987 Test Way","Los Angeles","CA","90007","test@email.com","213-555-0007","weekly","weekly","abc","chlorine","medium","Should fail - invalid rate"
+"Negative Rate","147 Test Ct","Los Angeles","CA","90008","test@email.com","213-555-0008","weekly","weekly","-100","saltwater","large","Should fail - negative rate"

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuthStore } from '../../store/authStore'
 import { Menu, X, User, LogOut, Settings, MapPin, Upload, TrendingUp } from 'lucide-react'
@@ -6,7 +6,21 @@ import { Menu, X, User, LogOut, Settings, MapPin, Upload, TrendingUp } from 'luc
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false)
+  const profileMenuRef = useRef<HTMLDivElement>(null)
   const { user, isAuthenticated, logout } = useAuthStore()
+
+  // Close profile dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (profileMenuRef.current && !profileMenuRef.current.contains(event.target as Node)) {
+        setIsProfileMenuOpen(false)
+      }
+    }
+    if (isProfileMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside)
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [isProfileMenuOpen])
   const navigate = useNavigate()
   const location = useLocation()
 
@@ -98,7 +112,7 @@ export default function Header() {
           {/* Desktop User Menu */}
           <div className="hidden md:flex items-center space-x-4">
             {isAuthenticated ? (
-              <div className="relative">
+              <div className="relative" ref={profileMenuRef}>
                 <button
                   onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
                   className="flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"

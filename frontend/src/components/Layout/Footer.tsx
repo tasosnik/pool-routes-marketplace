@@ -1,4 +1,5 @@
 import { MapPin } from 'lucide-react'
+import { Link } from 'react-router-dom'
 
 export default function Footer() {
   const currentYear = new Date().getFullYear()
@@ -19,15 +20,15 @@ export default function Footer() {
               © {currentYear} PoolRoute OS. All rights reserved.
             </p>
             <div className="flex space-x-4 text-sm text-gray-500">
-              <a href="/privacy" className="hover:text-gray-700 transition-colors">
+              <Link to="/privacy" className="hover:text-gray-700 transition-colors">
                 Privacy Policy
-              </a>
-              <a href="/terms" className="hover:text-gray-700 transition-colors">
+              </Link>
+              <Link to="/terms" className="hover:text-gray-700 transition-colors">
                 Terms of Service
-              </a>
-              <a href="/support" className="hover:text-gray-700 transition-colors">
+              </Link>
+              <Link to="/support" className="hover:text-gray-700 transition-colors">
                 Support
-              </a>
+              </Link>
             </div>
           </div>
         </div>

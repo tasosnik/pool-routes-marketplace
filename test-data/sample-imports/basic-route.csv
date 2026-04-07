@@ -1,0 +1,11 @@
+customer_name,street,city,state,zip,email,phone,service_type,frequency,monthly_rate,pool_type,pool_size,notes
+"Sample Customer 1","123 Main St","Los Angeles","CA","90001","customer1@email.com","213-555-0001","weekly","weekly","200","chlorine","medium","Test account 1"
+"Sample Customer 2","456 Oak Ave","Los Angeles","CA","90002","customer2@email.com","213-555-0002","weekly","weekly","225","saltwater","large","Test account 2"
+"Sample Customer 3","789 Elm Dr","Los Angeles","CA","90003","","213-555-0003","biweekly","biweekly","150","chlorine","small","Test account 3"
+"Sample Customer 4","321 Pine St","Los Angeles","CA","90004","customer4@email.com","213-555-0004","weekly","weekly","250","chlorine","large","Test account 4"
+"Sample Customer 5","654 Maple Ave","Los Angeles","CA","90005","customer5@email.com","","weekly","weekly","175","saltwater","medium","Test account 5"
+"Sample Customer 6","987 Cedar Blvd","Los Angeles","CA","90006","customer6@email.com","213-555-0006","monthly","monthly","100","chlorine","small","Test account 6"
+"Sample Customer 7","147 Birch Ln","Los Angeles","CA","90007","","213-555-0007","weekly","weekly","300","saltwater","xlarge","Test account 7"
+"Sample Customer 8","258 Spruce Way","Los Angeles","CA","90008","customer8@email.com","213-555-0008","weekly","weekly","225","chlorine","medium","Test account 8"
+"Sample Customer 9","369 Willow Ct","Los Angeles","CA","90009","customer9@email.com","213-555-0009","weekly","weekly","200","chlorine","large","Test account 9"
+"Sample Customer 10","741 Ash Dr","Los Angeles","CA","90010","customer10@email.com","213-555-0010","biweekly","biweekly","175","saltwater","medium","Test account 10"

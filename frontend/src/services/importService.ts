@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = (import.meta as any).env.VITE_API_URL || 'http://localhost:3001';
+const API_URL = (import.meta as any).env.VITE_API_URL || '';
 
 export interface ImportResult {
   success: boolean;
@@ -47,10 +47,18 @@ export enum DuplicateStrategy {
 
 class ImportService {
   private getAuthHeaders(): Record<string, string> {
-    const token = localStorage.getItem('access_token');
-    return {
-      'Authorization': token ? `Bearer ${token}` : '',
-    };
+    const raw = localStorage.getItem('poolroute-auth');
+    if (raw) {
+      try {
+        const authData = JSON.parse(raw);
+        if (authData?.state?.token) {
+          return { 'Authorization': `Bearer ${authData.state.token}` };
+        }
+      } catch {
+        // ignore parse errors
+      }
+    }
+    return {};
   }
 
   async validateCSV(file: File): Promise<ImportResult> {

@@ -1,0 +1,81 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Pool Route CSV Import Schema",
+  "type": "object",
+  "properties": {
+    "customer_name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200,
+      "description": "Full name of the customer"
+    },
+    "street": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200,
+      "description": "Street address"
+    },
+    "city": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100,
+      "description": "City name"
+    },
+    "state": {
+      "type": "string",
+      "pattern": "^[A-Z]{2}$",
+      "description": "Two-letter state code"
+    },
+    "zip": {
+      "type": "string",
+      "pattern": "^[0-9]{5}(-[0-9]{4})?$",
+      "description": "ZIP code (5 or 9 digits)"
+    },
+    "email": {
+      "type": "string",
+      "format": "email",
+      "description": "Customer email address"
+    },
+    "phone": {
+      "type": "string",
+      "pattern": "^[0-9]{3}-[0-9]{3}-[0-9]{4}$|^\\([0-9]{3}\\) [0-9]{3}-[0-9]{4}$|^[0-9]{10}$",
+      "description": "Phone number (various formats accepted)"
+    },
+    "service_type": {
+      "type": "string",
+      "enum": ["weekly", "biweekly", "monthly", "onetime"],
+      "default": "weekly",
+      "description": "Type of service"
+    },
+    "frequency": {
+      "type": "string",
+      "enum": ["weekly", "biweekly", "monthly"],
+      "default": "weekly",
+      "description": "Service frequency"
+    },
+    "monthly_rate": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 10000,
+      "description": "Monthly service rate in dollars"
+    },
+    "pool_type": {
+      "type": "string",
+      "enum": ["chlorine", "saltwater", "natural"],
+      "default": "chlorine",
+      "description": "Type of pool"
+    },
+    "pool_size": {
+      "type": "string",
+      "enum": ["small", "medium", "large", "xlarge"],
+      "description": "Size category of pool"
+    },
+    "notes": {
+      "type": "string",
+      "maxLength": 1000,
+      "description": "Special instructions or notes"
+    }
+  },
+  "required": ["customer_name", "street", "city", "state", "zip", "monthly_rate"],
+  "additionalProperties": false
+}

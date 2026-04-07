@@ -16,7 +16,7 @@ exports.up = function(knex) {
     table.string('state').notNullable();
     table.string('zip_code').notNullable();
     table.string('country').defaultTo('USA');
-    table.point('coordinates'); // PostGIS point (lat, lng)
+    table.text('coordinates'); // JSON point for now
 
     // Service details
     table.enu('service_type', ['weekly', 'biweekly', 'monthly', 'onetime']).notNullable();
@@ -46,7 +46,7 @@ exports.up = function(knex) {
     table.index(['service_type']);
     table.index(['next_service_date']);
     table.index(['customer_name']);
-    table.index(['coordinates'], null, 'gist'); // Spatial index
+    table.index(['coordinates']); // Regular index
   });
 };
 

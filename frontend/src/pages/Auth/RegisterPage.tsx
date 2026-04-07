@@ -295,13 +295,13 @@ export default function RegisterPage() {
                 <div className="ml-3 text-sm">
                   <label htmlFor="agreeToTerms" className="text-gray-700">
                     I agree to the{' '}
-                    <a href="/terms" className="text-primary-600 hover:text-primary-500">
+                    <Link to="/terms" className="text-primary-600 hover:text-primary-500">
                       Terms of Service
-                    </a>{' '}
+                    </Link>{' '}
                     and{' '}
-                    <a href="/privacy" className="text-primary-600 hover:text-primary-500">
+                    <Link to="/privacy" className="text-primary-600 hover:text-primary-500">
                       Privacy Policy
-                    </a>
+                    </Link>
                   </label>
                   {errors.agreeToTerms && (
                     <p className="form-error mt-1">{errors.agreeToTerms.message}</p>

@@ -15,8 +15,14 @@ import RoutesPage from './pages/Routes/RoutesPage'
 import RouteDetailPage from './pages/Routes/RouteDetailPage'
 import ImportPage from './pages/Import/ImportPage'
 import MarketplacePage from './pages/Marketplace/MarketplacePage'
+import ListingDetailPage from './pages/Marketplace/ListingDetailPage'
 import ProfilePage from './pages/Profile/ProfilePage'
 import NotFoundPage from './pages/NotFoundPage'
+
+// Legal Pages
+import TermsPage from './pages/Legal/TermsPage'
+import PrivacyPage from './pages/Legal/PrivacyPage'
+import SupportPage from './pages/Support/SupportPage'
 
 function App() {
   const { initializeAuth, isLoading } = useAuthStore()
@@ -46,13 +52,21 @@ function App() {
         <Route path="login" element={<LoginPage />} />
         <Route path="register" element={<RegisterPage />} />
 
+        {/* Legal and support pages */}
+        <Route path="terms" element={<TermsPage />} />
+        <Route path="privacy" element={<PrivacyPage />} />
+        <Route path="support" element={<SupportPage />} />
+
+        {/* Public marketplace — browsable without login */}
+        <Route path="marketplace" element={<MarketplacePage />} />
+        <Route path="marketplace/:id" element={<ListingDetailPage />} />
+
         {/* Protected routes */}
         <Route element={<PrivateRoute />}>
           <Route path="dashboard" element={<DashboardPage />} />
           <Route path="routes" element={<RoutesPage />} />
           <Route path="routes/:id" element={<RouteDetailPage />} />
           <Route path="import" element={<ImportPage />} />
-          <Route path="marketplace" element={<MarketplacePage />} />
           <Route path="profile" element={<ProfilePage />} />
         </Route>
 

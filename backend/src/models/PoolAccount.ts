@@ -311,22 +311,24 @@ export class PoolAccount extends BaseModel {
   }
 
   private static extractCoordinates(dbAccount: Record<string, any>): { latitude: number; longitude: number } | undefined {
-    // Use computed lat/lng columns if available
-    if (dbAccount.coordinates_lat !== null && dbAccount.coordinates_lng !== null) {
-      return {
-        latitude: parseFloat(dbAccount.coordinates_lat),
-        longitude: parseFloat(dbAccount.coordinates_lng)
-      };
+    // Use computed lat/lng columns if available and valid
+    if (dbAccount.coordinates_lat != null && dbAccount.coordinates_lng != null) {
+      const lat = parseFloat(dbAccount.coordinates_lat);
+      const lng = parseFloat(dbAccount.coordinates_lng);
+      if (!isNaN(lat) && !isNaN(lng) && (lat !== 0 || lng !== 0)) {
+        return { latitude: lat, longitude: lng };
+      }
     }
 
     // Fall back to JSON coordinates column
     if (dbAccount.coordinates) {
       try {
-        if (typeof dbAccount.coordinates === 'string') {
-          const parsed = JSON.parse(dbAccount.coordinates);
+        const parsed = typeof dbAccount.coordinates === 'string'
+          ? JSON.parse(dbAccount.coordinates)
+          : dbAccount.coordinates;
+        if (parsed && typeof parsed.latitude === 'number' && typeof parsed.longitude === 'number') {
           return parsed;
         }
-        return dbAccount.coordinates;
       } catch (error) {
         console.error('Error parsing coordinates JSON:', error);
       }

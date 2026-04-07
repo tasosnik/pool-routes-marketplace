@@ -1,0 +1,8 @@
+customer_name,street,city,state,zip,email,phone,service_type,frequency,monthly_rate,pool_type,pool_size,notes
+"John Doe","123 Duplicate St","Los Angeles","CA","90001","john@email.com","213-555-1111","weekly","weekly","200","chlorine","medium","Original account"
+"John Doe","123 Duplicate St","Los Angeles","CA","90001","john@email.com","213-555-1111","weekly","weekly","200","chlorine","medium","Exact duplicate"
+"John Doe","123 Duplicate St","Los Angeles","CA","90001","john.doe@email.com","213-555-1111","weekly","weekly","225","saltwater","large","Same address, different details"
+"Jane Smith","456 Normal Ave","Los Angeles","CA","90002","jane@email.com","213-555-2222","weekly","weekly","175","chlorine","small","Normal account"
+"Jane Smith","456 Normal Ave","Los Angeles","CA","90002","jane.smith@email.com","213-555-2223","biweekly","biweekly","150","chlorine","small","Same name and address"
+"Unique Customer","789 Unique Dr","Los Angeles","CA","90003","unique@email.com","213-555-3333","weekly","weekly","250","saltwater","large","No duplicates"
+"John Doe","456 Different St","Los Angeles","CA","90004","john@email.com","213-555-1111","weekly","weekly","300","chlorine","xlarge","Same name, different address"

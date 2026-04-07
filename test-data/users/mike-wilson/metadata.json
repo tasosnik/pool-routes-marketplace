@@ -1,0 +1,61 @@
+{
+  "user": {
+    "email": "mike.wilson@example.com",
+    "name": "Mike Wilson",
+    "company": "Sunset Pool Services",
+    "role": "seller"
+  },
+  "route": {
+    "name": "Pasadena Heritage Route",
+    "description": "Well-established residential route in Pasadena with loyal customer base",
+    "serviceArea": {
+      "center": {
+        "latitude": 34.1478,
+        "longitude": -118.1445
+      },
+      "radius": 2.0
+    },
+    "statistics": {
+      "totalAccounts": 20,
+      "activeAccounts": 20,
+      "monthlyRevenue": 4200,
+      "averageRate": 210,
+      "serviceBreakdown": {
+        "weekly": 17,
+        "biweekly": 2,
+        "monthly": 1
+      },
+      "poolTypes": {
+        "chlorine": 14,
+        "saltwater": 6
+      },
+      "poolSizes": {
+        "small": 2,
+        "medium": 10,
+        "large": 8
+      }
+    },
+    "forSale": {
+      "listed": true,
+      "askingPrice": 126000,
+      "revenueMultiple": 2.5,
+      "reasonForSale": "Owner retiring after 15 years",
+      "highlights": [
+        "Stable customer base with 95% retention",
+        "Average customer tenure: 4.2 years",
+        "All accounts current on payments",
+        "Established relationships with local suppliers",
+        "Equipment and vehicle not included"
+      ]
+    }
+  },
+  "testScenarios": [
+    "Route for sale listing",
+    "Mix of residential and HOA accounts",
+    "Established customer relationships",
+    "Some cash-only customers",
+    "Family referral network",
+    "Moderate pricing tier ($100-275)"
+  ],
+  "notes": "Mike is retiring and selling this well-maintained route. He's willing to provide 30-day transition support to ensure smooth customer handover. Route has grown organically through referrals."
+}

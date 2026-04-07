@@ -1,0 +1,49 @@
+{
+  "user": {
+    "email": "sarah.johnson@example.com",
+    "name": "Sarah Johnson",
+    "company": "Blue Wave Pool Care",
+    "role": "operator"
+  },
+  "route": {
+    "name": "Santa Monica Coastal Route",
+    "description": "Beach area residential and multi-family properties in Santa Monica",
+    "serviceArea": {
+      "center": {
+        "latitude": 34.0195,
+        "longitude": -118.4912
+      },
+      "radius": 3.0
+    },
+    "statistics": {
+      "totalAccounts": 30,
+      "activeAccounts": 30,
+      "monthlyRevenue": 7975,
+      "averageRate": 266,
+      "serviceBreakdown": {
+        "weekly": 26,
+        "biweekly": 3,
+        "monthly": 1
+      },
+      "poolTypes": {
+        "chlorine": 19,
+        "saltwater": 11
+      },
+      "poolSizes": {
+        "small": 3,
+        "medium": 15,
+        "large": 8,
+        "xlarge": 4
+      }
+    }
+  },
+  "testScenarios": [
+    "Mix of residential and multi-family properties",
+    "Several HOAs and apartment complexes",
+    "Beach proximity considerations",
+    "Environmental/eco-friendly service requests",
+    "Mix of property values ($150-550 range)",
+    "Some properties without email contacts"
+  ],
+  "notes": "Sarah specializes in coastal properties and multi-family buildings. She has expertise with salt air effects on pool equipment and maintains several high-profile beachfront properties."
+}
