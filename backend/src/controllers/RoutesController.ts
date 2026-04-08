@@ -496,12 +496,31 @@ export class RoutesController {
         return;
       }
 
+      // Geocode the address to get coordinates for map display
+      let coordinates: { latitude: number; longitude: number } | undefined;
+      try {
+        const addressParts = [street, city, state, zipCode].filter(Boolean).join(', ');
+        const geocodeUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(addressParts)}&limit=1`;
+        const geocodeRes = await fetch(geocodeUrl, {
+          headers: { 'User-Agent': 'PoolRouteOS/1.0' }
+        });
+        const geocodeData = await geocodeRes.json() as Array<{ lat: string; lon: string }>;
+        if (geocodeData.length > 0) {
+          coordinates = {
+            latitude: parseFloat(geocodeData[0].lat),
+            longitude: parseFloat(geocodeData[0].lon)
+          };
+        }
+      } catch {
+        // Geocoding is best-effort — account still gets created without coordinates
+      }
+
       const account = await PoolAccount.createAccount({
         routeId: id,
         customerName,
         customerEmail,
         customerPhone,
-        address: { street, city: city || '', state: state || '', zipCode: zipCode || '' },
+        address: { street, city: city || '', state: state || '', zipCode: zipCode || '', coordinates },
         serviceType: serviceType || ServiceType.WEEKLY,
         frequency: frequency || ServiceFrequency.WEEKLY,
         monthlyRate: parseFloat(monthlyRate) || 0,

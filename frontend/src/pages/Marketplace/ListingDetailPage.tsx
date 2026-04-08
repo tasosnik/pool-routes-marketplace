@@ -26,16 +26,9 @@ export default function ListingDetailPage() {
         const response = await marketplaceService.getListing(id)
         if (response.success && response.data) {
           setListing(response.data)
-          // Fetch accounts for the route to show on map
-          if (response.data.routeId) {
-            try {
-              const routeResponse = await routeService.getRoute(response.data.routeId)
-              if (routeResponse.success && routeResponse.data?.accounts) {
-                setAccounts(routeResponse.data.accounts)
-              }
-            } catch {
-              // Accounts may not be accessible if user doesn't own the route — that's fine
-            }
+          // Use accounts included in the listing response
+          if (response.data.accounts) {
+            setAccounts(response.data.accounts)
           }
           // Fetch user's own routes to show on map for comparison
           if (isAuthenticated) {
@@ -241,8 +234,6 @@ export default function ListingDetailPage() {
                     <a
                       href={`mailto:${listing.seller.email}?subject=${encodeURIComponent(`Inquiry about ${listing.title}`)}`}
                       className="btn btn-primary w-full text-center block"
-                      target="_blank"
-                      rel="noopener noreferrer"
                     >
                       Contact Seller
                     </a>

@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import Joi from 'joi';
 import { RouteListing } from '../models/RouteListing';
 import { Route } from '../models/Route';
+import { PoolAccount } from '../models/PoolAccount';
 import { UserRole, ListingStatus } from '../types';
 import { ApiResponse, PaginatedResponse } from '../types';
 
@@ -173,11 +174,21 @@ export class MarketplaceController {
         return;
       }
 
+      // Fetch accounts for the listing's route to show on map
+      let accounts: any[] = [];
+      if (listing.routeId) {
+        try {
+          accounts = await PoolAccount.findByRouteId(listing.routeId);
+        } catch {
+          // Non-critical — map will just show approximate area
+        }
+      }
+
       // Strip seller email for unauthenticated requests
-      let listingData: any = listing;
+      let listingData: any = { ...listing, accounts };
       if (!req.user && listing.seller) {
         const { email, ...sellerWithoutEmail } = listing.seller as any;
-        listingData = { ...listing, seller: sellerWithoutEmail };
+        listingData = { ...listingData, seller: sellerWithoutEmail };
       }
 
       res.json({

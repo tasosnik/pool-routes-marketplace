@@ -164,6 +164,7 @@ export interface RouteListing {
   // Joined data (using any for flexible partial data)
   route?: any;
   seller?: any;
+  accounts?: PoolAccount[];
 }
 
 export enum ListingStatus {
