@@ -518,4 +518,48 @@ export class RoutesController {
       res.status(500).json({ success: false, error: 'Failed to create pool account' });
     }
   }
+
+  /**
+   * DELETE /api/routes/:id/accounts/:accountId
+   * Remove a pool account from a route
+   */
+  static async deleteAccount(req: Request, res: Response): Promise<void> {
+    try {
+      const { id, accountId } = req.params;
+
+      // Verify route exists and user owns it
+      const route = await Route.findById(id);
+      if (!route) {
+        res.status(404).json({ success: false, error: 'Route not found' });
+        return;
+      }
+
+      if (req.user?.role !== UserRole.ADMIN && route.owner_id !== req.user?.id) {
+        res.status(403).json({ success: false, error: 'Access denied' });
+        return;
+      }
+
+      // Verify account belongs to this route
+      const accounts = await PoolAccount.findByRouteId(id);
+      const account = accounts.find(a => a.id === accountId);
+      if (!account) {
+        res.status(404).json({ success: false, error: 'Account not found on this route' });
+        return;
+      }
+
+      const deleted = await PoolAccount.deleteById(accountId);
+      if (!deleted) {
+        res.status(500).json({ success: false, error: 'Failed to delete account' });
+        return;
+      }
+
+      // Recalculate route stats after removing account
+      await Route.updateRouteStats(id);
+
+      res.json({ success: true, message: 'Account deleted successfully' });
+    } catch (error) {
+      console.error('Error deleting pool account:', error);
+      res.status(500).json({ success: false, error: 'Failed to delete pool account' });
+    }
+  }
 }

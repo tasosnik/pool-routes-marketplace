@@ -166,7 +166,14 @@ export default function MarketplacePage() {
       {!loading && listings.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {listings.map(listing => (
-            <div key={listing.id} className="card hover:shadow-lg transition-shadow">
+            <div
+              key={listing.id}
+              className="card hover:shadow-lg transition-shadow cursor-pointer"
+              onClick={() => navigate(`/marketplace/${listing.id}`)}
+              role="link"
+              tabIndex={0}
+              onKeyDown={(e) => { if (e.key === 'Enter') navigate(`/marketplace/${listing.id}`) }}
+            >
               <div className="card-body">
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">
                   {listing.title}
@@ -197,17 +204,9 @@ export default function MarketplacePage() {
                 </div>
 
                 <div className="border-t pt-4">
-                  <div className="flex justify-between items-center">
-                    <span className="text-2xl font-bold text-primary-600">
-                      {formatCurrency(listing.askingPrice)}
-                    </span>
-                    <button
-                      onClick={() => navigate(`/marketplace/${listing.id}`)}
-                      className="btn btn-sm btn-primary"
-                    >
-                      View Details
-                    </button>
-                  </div>
+                  <span className="text-2xl font-bold text-primary-600">
+                    {formatCurrency(listing.askingPrice)}
+                  </span>
                 </div>
               </div>
             </div>

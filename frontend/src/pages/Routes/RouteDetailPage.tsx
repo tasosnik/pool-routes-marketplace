@@ -152,8 +152,26 @@ export default function RouteDetailPage() {
     toast('Account editing coming soon. Use the Import page to update account data in bulk.')
   }
 
-  const handleAccountDelete = (_accountId: string) => {
-    toast('Account removal coming soon. Contact support if you need to remove an account urgently.')
+  const handleAccountDelete = async (accountId: string) => {
+    if (!id) return
+    if (!window.confirm('Are you sure you want to remove this account?')) return
+
+    try {
+      const response = await routeService.deleteAccount(id, accountId)
+      if (response.success) {
+        setAccounts(prev => prev.filter(a => a.id !== accountId))
+        toast.success('Account removed successfully')
+        // Refresh route to get updated stats
+        const routeResponse = await routeService.getRoute(id)
+        if (routeResponse.success && routeResponse.data) {
+          setRoute(routeResponse.data.route)
+        }
+      } else {
+        toast.error((response as any).error || 'Failed to remove account')
+      }
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to remove account')
+    }
   }
 
   const handleAddAccount = async (e: React.FormEvent) => {
@@ -518,6 +536,17 @@ export default function RouteDetailPage() {
                           onChange={e => setAddAccountForm(f => ({ ...f, state: e.target.value }))}
                           className="w-full px-2 py-1.5 border border-gray-300 rounded text-sm"
                           maxLength={2}
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-gray-700 mb-1">ZIP Code</label>
+                        <input
+                          type="text"
+                          value={addAccountForm.zipCode}
+                          onChange={e => setAddAccountForm(f => ({ ...f, zipCode: e.target.value }))}
+                          className="w-full px-2 py-1.5 border border-gray-300 rounded text-sm"
+                          placeholder="e.g., 90210"
+                          maxLength={10}
                         />
                       </div>
                       <div>

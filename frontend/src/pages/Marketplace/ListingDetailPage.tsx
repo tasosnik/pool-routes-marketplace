@@ -15,6 +15,7 @@ export default function ListingDetailPage() {
   const { isAuthenticated } = useAuthStore()
   const [listing, setListing] = useState<RouteListing | null>(null)
   const [accounts, setAccounts] = useState<PoolAccount[]>([])
+  const [myAccounts, setMyAccounts] = useState<PoolAccount[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -34,6 +35,28 @@ export default function ListingDetailPage() {
               }
             } catch {
               // Accounts may not be accessible if user doesn't own the route — that's fine
+            }
+          }
+          // Fetch user's own routes to show on map for comparison
+          if (isAuthenticated) {
+            try {
+              const myRoutesResponse = await routeService.getRoutes({ limit: 100 })
+              if (myRoutesResponse.success && myRoutesResponse.data?.routes) {
+                const allMyAccounts: PoolAccount[] = []
+                for (const r of myRoutesResponse.data.routes) {
+                  try {
+                    const rDetail = await routeService.getRoute(r.id)
+                    if (rDetail.success && rDetail.data?.accounts) {
+                      allMyAccounts.push(...rDetail.data.accounts)
+                    }
+                  } catch {
+                    // skip
+                  }
+                }
+                setMyAccounts(allMyAccounts)
+              }
+            } catch {
+              // User may not have any routes
             }
           }
         } else {
@@ -106,6 +129,7 @@ export default function ListingDetailPage() {
                 title={listing.title}
                 serviceArea={listing.route?.serviceAreaName}
                 accounts={accounts}
+                myAccounts={myAccounts}
               />
             </Suspense>
           )}
@@ -212,18 +236,34 @@ export default function ListingDetailPage() {
               </div>
 
               {isAuthenticated ? (
-                <button
-                  onClick={() => {
-                    if (listing.seller?.email) {
-                      window.location.href = `mailto:${listing.seller.email}?subject=Inquiry about ${listing.title}`
-                    } else {
-                      toast.error('Seller contact information is not available')
-                    }
-                  }}
-                  className="btn btn-primary w-full"
-                >
-                  Contact Seller
-                </button>
+                listing.seller?.email ? (
+                  <div className="space-y-2">
+                    <a
+                      href={`mailto:${listing.seller.email}?subject=${encodeURIComponent(`Inquiry about ${listing.title}`)}`}
+                      className="btn btn-primary w-full text-center block"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Contact Seller
+                    </a>
+                    <button
+                      onClick={() => {
+                        navigator.clipboard.writeText(listing.seller!.email!)
+                        toast.success('Email copied to clipboard')
+                      }}
+                      className="btn btn-outline w-full text-sm"
+                    >
+                      Copy Email
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => toast.error('Seller contact information is not available')}
+                    className="btn btn-primary w-full"
+                  >
+                    Contact Seller
+                  </button>
+                )
               ) : (
                 <button
                   onClick={() => navigate('/login', { state: { from: { pathname: `/marketplace/${id}` } } })}

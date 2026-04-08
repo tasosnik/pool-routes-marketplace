@@ -257,6 +257,18 @@ export class RouteService {
     }
   }
 
+  async deleteAccount(routeId: string, accountId: string): Promise<ApiResponse> {
+    try {
+      const response: AxiosResponse<ApiResponse> = await api.delete(`/routes/${routeId}/accounts/${accountId}`)
+      return response.data
+    } catch (error: any) {
+      if (error.response?.data) {
+        return error.response.data
+      }
+      throw new Error(error.message || 'Network error')
+    }
+  }
+
   async addAccount(routeId: string, accountData: {
     customerName: string
     customerEmail?: string

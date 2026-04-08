@@ -38,6 +38,12 @@ router.post('/:id/accounts',
   RoutesController.createAccount
 );
 
+// DELETE /api/routes/:id/accounts/:accountId - Remove a pool account from a route (owner or admin only)
+router.delete('/:id/accounts/:accountId',
+  requireOwnership('id'),
+  RoutesController.deleteAccount
+);
+
 // PUT /api/routes/:id/sale-status - Toggle route for sale status (owner or admin only)
 router.put('/:id/sale-status',
   requireOwnership('id'),
