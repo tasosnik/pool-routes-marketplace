@@ -89,8 +89,16 @@ export default function ListingDetailPage() {
     )
   }
 
-  const centerLat = listing.route?.centerLat
-  const centerLng = listing.route?.centerLng
+  // Use route center if available, otherwise compute from account coordinates
+  let centerLat = listing.route?.centerLat
+  let centerLng = listing.route?.centerLng
+  if (!centerLat || !centerLng) {
+    const accsWithCoords = accounts.filter(a => a.address?.coordinates?.latitude && a.address?.coordinates?.longitude)
+    if (accsWithCoords.length > 0) {
+      centerLat = accsWithCoords.reduce((sum, a) => sum + a.address.coordinates!.latitude, 0) / accsWithCoords.length
+      centerLng = accsWithCoords.reduce((sum, a) => sum + a.address.coordinates!.longitude, 0) / accsWithCoords.length
+    }
+  }
   const hasLocation = centerLat && centerLng
 
   return (
