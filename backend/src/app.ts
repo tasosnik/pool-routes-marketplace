@@ -15,6 +15,9 @@ import marketplaceRoutes from './routes/marketplace';
 // Create Express application
 const app: Application = express();
 
+// Trust proxy (required behind Railway/Vercel reverse proxies for rate limiting and IP detection)
+app.set('trust proxy', 1);
+
 // Security middleware
 app.use(helmet({
   contentSecurityPolicy: {
